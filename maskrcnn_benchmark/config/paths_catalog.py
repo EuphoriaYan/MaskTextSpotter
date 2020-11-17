@@ -31,7 +31,6 @@ class DatasetCatalog(object):
         "icdar_2013_train": (
             "icdar2013/train_images",
             "icdar2013/train_gts",
-
         ),
         "icdar_2013_test": (
             "icdar2013/test_images",
@@ -45,7 +44,6 @@ class DatasetCatalog(object):
         "icdar_2015_test": (
             "icdar2015/test_images",
             # "icdar2015/test_gts",
-
         ),
         "synthtext_train": (
             "synthtext/train_images",

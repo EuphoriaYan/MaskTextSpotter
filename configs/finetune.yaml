@@ -53,8 +53,8 @@ DATASETS:
   TRAIN: ("synthtext_train","icdar_2013_train","icdar_2015_train","scut-eng-char_train","total_text_train")
   RATIOS: [ 0.25,0.25,0.25,0.125,0.125 ]
   # TEST: ("icdar_2013_test",)
-  # TEST: ("total_text_test",)
-  TEST: ("chinese_books",)
+  TEST: ("total_text_test",)
+  # TEST: ("chinese_books",)
   AUG: True
 DATALOADER:
   SIZE_DIVISIBILITY: 32

@@ -300,6 +300,7 @@ def creat_color_map(n_class, width):
 
 
 def visualization(image, polygons, char_polygons, words, resize_ratio, colors):
+    image = image.convert('RGBA')
     draw = ImageDraw.Draw(image, 'RGBA')
     for polygon in polygons:
         draw.polygon(polygon, fill=None, outline=(0, 255, 0, 255))
@@ -309,6 +310,7 @@ def visualization(image, polygons, char_polygons, words, resize_ratio, colors):
             char = words[i][j]
             color = colors[char2num(char)]
             draw.polygon(polygon, fill=color, outline=color)
+    return image
 
 
 def prepare_results_for_evaluation(predictions, output_folder, model_name, vis=False):
@@ -320,7 +322,7 @@ def prepare_results_for_evaluation(predictions, output_folder, model_name, vis=F
         if not os.path.isdir(visu_dir):
             os.mkdir(visu_dir)
     for image_path, prediction in predictions.items():
-        im_name = image_path.split('/')[-1]
+        im_name = os.path.splitext(os.path.basename(image_path))[0] + '.png'
         global_prediction, char_mask, boxes_char, seq_words, seq_scores, detailed_seq_scores = prediction[0], \
                                                                                                prediction[1], \
                                                                                                prediction[2], \
@@ -363,7 +365,7 @@ def prepare_results_for_evaluation(predictions, output_folder, model_name, vis=F
             result_logs.append(result_log)
         if vis:
             colors = creat_color_map(37, 255)
-            visualization(img, polygons, char_polygons, words, resize_ratio, colors)
+            img = visualization(img, polygons, char_polygons, words, resize_ratio, colors)
             img.save(os.path.join(visu_dir, im_name))
         format_output(results_dir, result_logs, im_name)
 
