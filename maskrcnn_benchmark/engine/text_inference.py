@@ -364,7 +364,7 @@ def prepare_results_for_evaluation(predictions, output_folder, model_name, vis=F
                     seq_score] + [char_score] + [detailed_seq_score]
             result_logs.append(result_log)
         if vis:
-            colors = creat_color_map(37, 255)
+            colors = creat_color_map(23327, 255)
             img = visualization(img, polygons, char_polygons, words, resize_ratio, colors)
             img.save(os.path.join(visu_dir, im_name))
         format_output(results_dir, result_logs, im_name)
@@ -380,7 +380,8 @@ def inference(
         expected_results_sigma_tol=4,
         output_folder=None,
         model_name=None,
-        cfg=None
+        cfg=None,
+        char_num=37
 ):
     # convert to a torch.device for efficiency
     model_name = model_name.split('.')[0] + '_' + str(cfg.INPUT.MIN_SIZE_TEST)

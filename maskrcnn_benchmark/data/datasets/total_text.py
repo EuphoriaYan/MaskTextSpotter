@@ -12,13 +12,14 @@ import torch
 
 
 class TotaltextDataset(object):
-    def __init__(self, use_charann, imgs_dir, gts_dir, transforms=None):
+    def __init__(self, use_charann, imgs_dir, gts_dir, charset, transforms=None):
         self.use_charann = use_charann
         self.image_lists = [os.path.join(imgs_dir, img) for img in os.listdir(imgs_dir)]
         self.gts_dir = gts_dir
         self.transforms = transforms
         self.min_proposal_size = 2
-        self.char_classes = '_0123456789abcdefghijklmnopqrstuvwxyz'
+        self.char_classes = ''.join([s.strip() for s in open(charset).read()])
+        # self.char_classes = '_0123456789abcdefghijklmnopqrstuvwxyz'
         self.vis = False
 
     def __getitem__(self, item):
@@ -89,7 +90,8 @@ class TotaltextDataset(object):
         lines = open(gt_path).readlines()
         for line in lines:
             charbbs = []
-            strs, loc = self.line2boxes(line)
+            parts = line.strip().split(',')
+            strs, loc = [parts[-1]], np.array([[float(x) for x in parts[:-1]]])
             word = strs[0]
             if word == '###':
                 continue

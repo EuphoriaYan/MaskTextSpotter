@@ -85,6 +85,8 @@ _C.DATALOADER.SIZE_DIVISIBILITY = 0
 # is compatible. This groups portrait images together, and landscape images
 # are not batched with portrait images.
 _C.DATALOADER.ASPECT_RATIO_GROUPING = True
+# charset file
+_C.DATALOADER.CHARSET = "charset/charset_xl.txt"
 
 # ---------------------------------------------------------------------------- #
 # Backbone options

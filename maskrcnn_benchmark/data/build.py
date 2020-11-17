@@ -36,6 +36,7 @@ def build_dataset(cfg, dataset_list, transforms, dataset_catalog, is_train=True)
         if data["factory"] == "COCODataset":
             args["remove_images_without_annotations"] = is_train
         args["transforms"] = transforms
+        args["charset"] = cfg.DATALOADER.CHARSET
         # make dataset from factory
         dataset = factory(**args)
         datasets.append(dataset)

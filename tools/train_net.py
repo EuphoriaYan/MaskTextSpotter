@@ -153,10 +153,10 @@ def main():
     logger = setup_logger("maskrcnn_benchmark", output_dir, get_rank())
     logger.info("Using {} GPUs".format(num_gpus))
     logger.info(args)
-
+    '''
     logger.info("Collecting env info (might take some time)")
     logger.info("\n" + collect_env_info())
-
+    '''
     logger.info("Loaded configuration file {}".format(args.config_file))
     with open(args.config_file, "r") as cf:
         config_str = "\n" + cf.read()

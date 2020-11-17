@@ -1,7 +1,7 @@
 MODEL:
   META_ARCHITECTURE: "GeneralizedRCNN"
-  # WEIGHT: "catalog://ImageNetPretrained/MSRA/R-50"
-  WEIGHT: "./outputs/finetune/model_finetune.pth"
+  WEIGHT: "catalog://ImageNetPretrained/MSRA/R-50"
+  # WEIGHT: "./outputs/finetune/model_finetune.pth"
   BACKBONE:
     CONV_BODY: "R-50-FPN"
     OUT_CHANNELS: 256
@@ -33,7 +33,7 @@ MODEL:
     RESOLUTION_H: 32
     RESOLUTION_W: 128
     SHARE_BOX_FEATURE_EXTRACTOR: False
-    CHAR_NUM_CLASSES: 37
+    CHAR_NUM_CLASSES: 23327
     USE_WEIGHTED_CHAR_MASK: True
     MASK_BATCH_SIZE_PER_IM: 64
   MASK_ON: True
@@ -46,12 +46,13 @@ SEQUENCE:
   TEACHER_FORCE_RATIO: 1.0
   TWO_CONV: True
 DATASETS:
-  TRAIN: ("synthtext_train",)
-  TEST: ("icdar_2013_test",)
+  TRAIN: ("total_text_train",)
+  TEST: ("total_text_test",)
 DATALOADER:
   SIZE_DIVISIBILITY: 32
   NUM_WORKERS: 4
   ASPECT_RATIO_GROUPING: False
+  CHARSET: "charset/charset_xl.txt"
 SOLVER:
   BASE_LR: 0.01 #0.02
   WARMUP_FACTOR: 0.1
