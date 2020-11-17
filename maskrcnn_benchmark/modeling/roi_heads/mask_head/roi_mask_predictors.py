@@ -6,6 +6,7 @@ from maskrcnn_benchmark.layers import Conv2d
 from maskrcnn_benchmark.layers import ConvTranspose2d
 from .roi_seq_predictors import make_roi_seq_predictor
 
+
 class MaskRCNNC4Predictor(nn.Module):
     def __init__(self, cfg):
         super(MaskRCNNC4Predictor, self).__init__()
@@ -34,6 +35,7 @@ class MaskRCNNC4Predictor(nn.Module):
     def forward(self, x):
         x = F.relu(self.conv5_mask(x))
         return self.mask_fcn_logits(x)
+
 
 class CharMaskRCNNC4Predictor(nn.Module):
     def __init__(self, cfg):
@@ -69,6 +71,7 @@ class CharMaskRCNNC4Predictor(nn.Module):
     def forward(self, x):
         x = F.relu(self.conv5_mask(x))
         return self.mask_fcn_logits(x), self.char_mask_fcn_logits(x)
+
 
 class SeqCharMaskRCNNC4Predictor(nn.Module):
     def __init__(self, cfg):
@@ -109,9 +112,12 @@ class SeqCharMaskRCNNC4Predictor(nn.Module):
             return self.mask_fcn_logits(x), self.char_mask_fcn_logits(x), loss_seq_decoder
         else:
             decoded_chars, decoded_scores, detailed_decoded_scores = self.seq(x, use_beam_search=True)
-            return self.mask_fcn_logits(x), self.char_mask_fcn_logits(x), decoded_chars, decoded_scores, detailed_decoded_scores
-        
-_ROI_MASK_PREDICTOR = {"MaskRCNNC4Predictor": MaskRCNNC4Predictor, "CharMaskRCNNC4Predictor": CharMaskRCNNC4Predictor, "SeqCharMaskRCNNC4Predictor": SeqCharMaskRCNNC4Predictor}
+            return self.mask_fcn_logits(x), self.char_mask_fcn_logits(
+                x), decoded_chars, decoded_scores, detailed_decoded_scores
+
+
+_ROI_MASK_PREDICTOR = {"MaskRCNNC4Predictor": MaskRCNNC4Predictor, "CharMaskRCNNC4Predictor": CharMaskRCNNC4Predictor,
+                       "SeqCharMaskRCNNC4Predictor": SeqCharMaskRCNNC4Predictor}
 
 
 def make_roi_mask_predictor(cfg):

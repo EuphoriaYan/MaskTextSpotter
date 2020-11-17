@@ -35,7 +35,6 @@ class Logger(object):
         if distributed_rank == 0:
             self.writer = SummaryWriter(log_dir)
 
-
     def scalar_summary(self, tag, value, step):
         """Log a scalar variable."""
         if self.distributed_rank == 0:

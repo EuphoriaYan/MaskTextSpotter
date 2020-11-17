@@ -9,6 +9,7 @@ import torch.distributed as dist
 from maskrcnn_benchmark.utils.comm import get_world_size, is_main_process
 from maskrcnn_benchmark.utils.metric_logger import MetricLogger
 
+
 def reduce_loss_dict(loss_dict):
     """
     Reduce the loss dictionary from all processes so that process with rank
@@ -35,16 +36,16 @@ def reduce_loss_dict(loss_dict):
 
 
 def do_train(
-    model,
-    data_loader,
-    optimizer,
-    scheduler,
-    checkpointer,
-    device,
-    checkpoint_period,
-    arguments,
-    tb_logger,
-    cfg,
+        model,
+        data_loader,
+        optimizer,
+        scheduler,
+        checkpointer,
+        device,
+        checkpoint_period,
+        arguments,
+        tb_logger,
+        cfg,
 ):
     logger = logging.getLogger("maskrcnn_benchmark.trainer")
     logger.info("Start training")

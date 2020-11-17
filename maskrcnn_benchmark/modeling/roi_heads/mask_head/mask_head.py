@@ -39,6 +39,7 @@ def keep_only_positive_boxes(boxes, batch_size_per_im):
         positive_inds.append(inds_mask)
     return positive_boxes, positive_inds
 
+
 # TODO
 def project_char_masks_on_boxes(segmentation_masks, segmentation_char_masks, proposals, discretization_size):
     """
@@ -70,7 +71,8 @@ def project_char_masks_on_boxes(segmentation_masks, segmentation_char_masks, pro
     # masks is not efficient GPU-wise (possibly several small tensors for
     # representing a single instance mask)
     proposals = proposals.bbox.to(torch.device("cpu"))
-    for segmentation_mask, segmentation_char_mask, proposal in zip(segmentation_masks, segmentation_char_masks, proposals):
+    for segmentation_mask, segmentation_char_mask, proposal in zip(segmentation_masks, segmentation_char_masks,
+                                                                   proposals):
         # crop the masks, resize them to the desired resolution and
         # then convert them to the tensor representation,
         # instead of the list representation that was used
@@ -86,8 +88,16 @@ def project_char_masks_on_boxes(segmentation_masks, segmentation_char_masks, pro
         decoder_targets.append(decoder_target)
         word_targets.append(word_target)
     if len(masks) == 0:
-        return torch.empty(0, dtype=torch.float32, device=device), torch.empty(0, dtype=torch.long, device=device), torch.empty(0, dtype=torch.float32, device=device), torch.empty(0, dtype=torch.long, device=device)
-    return torch.stack(masks, dim=0).to(device, dtype=torch.float32), torch.stack(char_masks, dim=0).to(device, dtype=torch.long), torch.stack(char_mask_weights, dim=0).to(device, dtype=torch.float32), torch.stack(decoder_targets, dim=0).to(device, dtype=torch.long), torch.stack(word_targets, dim=0).to(device, dtype=torch.long)
+        return torch.empty(0, dtype=torch.float32, device=device), torch.empty(0, dtype=torch.long,
+                                                                               device=device), torch.empty(0,
+                                                                                                           dtype=torch.float32,
+                                                                                                           device=device), torch.empty(
+            0, dtype=torch.long, device=device)
+    return torch.stack(masks, dim=0).to(device, dtype=torch.float32), torch.stack(char_masks, dim=0).to(device,
+                                                                                                        dtype=torch.long), torch.stack(
+        char_mask_weights, dim=0).to(device, dtype=torch.float32), torch.stack(decoder_targets, dim=0).to(device,
+                                                                                                          dtype=torch.long), torch.stack(
+        word_targets, dim=0).to(device, dtype=torch.long)
 
 
 class ROIMaskHead(torch.nn.Module):
@@ -175,34 +185,40 @@ class ROIMaskHead(torch.nn.Module):
         if self.training:
             # during training, only focus on positive boxes
             all_proposals = proposals
-            proposals, positive_inds = keep_only_positive_boxes(proposals, self.cfg.MODEL.ROI_MASK_HEAD.MASK_BATCH_SIZE_PER_IM)
+            proposals, positive_inds = keep_only_positive_boxes(proposals,
+                                                                self.cfg.MODEL.ROI_MASK_HEAD.MASK_BATCH_SIZE_PER_IM)
         if self.training and self.cfg.MODEL.ROI_MASK_HEAD.SHARE_BOX_FEATURE_EXTRACTOR:
             x = features
             x = x[torch.cat(positive_inds, dim=0)]
         else:
             x = self.feature_extractor(features, proposals)
         if self.training and self.cfg.MODEL.CHAR_MASK_ON:
-            mask_targets, char_mask_targets, char_mask_weights, decoder_targets, word_targets = self.prepare_targets(proposals, targets)
+            mask_targets, char_mask_targets, char_mask_weights, decoder_targets, word_targets = self.prepare_targets(
+                proposals, targets)
             decoder_targets = cat(decoder_targets, dim=0)
             word_targets = cat(word_targets, dim=0)
         if self.cfg.MODEL.CHAR_MASK_ON:
             if self.cfg.SEQUENCE.SEQ_ON:
                 if not self.training:
-                    if x.numel()>0:
+                    if x.numel() > 0:
                         mask_logits, char_mask_logits, seq_outputs, seq_scores, detailed_seq_scores = self.predictor(x)
-                        result = self.post_processor(mask_logits, char_mask_logits, proposals, seq_outputs=seq_outputs, seq_scores=seq_scores, detailed_seq_scores=detailed_seq_scores)
+                        result = self.post_processor(mask_logits, char_mask_logits, proposals, seq_outputs=seq_outputs,
+                                                     seq_scores=seq_scores, detailed_seq_scores=detailed_seq_scores)
                         return x, result, {}
                     else:
                         return None, None, {}
-                mask_logits, char_mask_logits, seq_outputs = self.predictor(x, decoder_targets=decoder_targets, word_targets=word_targets)
-                loss_mask, loss_char_mask = self.loss_evaluator(proposals, mask_logits, char_mask_logits, mask_targets, char_mask_targets, char_mask_weights)
+                mask_logits, char_mask_logits, seq_outputs = self.predictor(x, decoder_targets=decoder_targets,
+                                                                            word_targets=word_targets)
+                loss_mask, loss_char_mask = self.loss_evaluator(proposals, mask_logits, char_mask_logits, mask_targets,
+                                                                char_mask_targets, char_mask_weights)
                 return x, all_proposals, dict(loss_mask=loss_mask, loss_char_mask=loss_char_mask, loss_seq=seq_outputs)
             else:
                 mask_logits, char_mask_logits = self.predictor(x)
                 if not self.training:
                     result = self.post_processor(mask_logits, char_mask_logits, proposals)
                     return x, result, {}
-                loss_mask, loss_char_mask = self.loss_evaluator(proposals, mask_logits, char_mask_logits, mask_targets, char_mask_targets, char_mask_weights)
+                loss_mask, loss_char_mask = self.loss_evaluator(proposals, mask_logits, char_mask_logits, mask_targets,
+                                                                char_mask_targets, char_mask_weights)
                 return x, all_proposals, dict(loss_mask=loss_mask, loss_char_mask=loss_char_mask)
         else:
             mask_logits = self.predictor(x)
@@ -211,6 +227,7 @@ class ROIMaskHead(torch.nn.Module):
                 return x, result, {}
             loss_mask = self.loss_evaluator(proposals, mask_logits, targets)
             return x, all_proposals, dict(loss_mask=loss_mask)
+
 
 def build_roi_mask_head(cfg):
     matcher = Matcher(

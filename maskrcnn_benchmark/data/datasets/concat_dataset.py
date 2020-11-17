@@ -22,34 +22,27 @@ class ConcatDataset(_ConcatDataset):
         dataset_idx, sample_idx = self.get_idxs(idx)
         return self.datasets[dataset_idx].get_img_info(sample_idx)
 
+
 class MixDataset(object):
-    def __init__(self,datasets,ratios):
-        self.datasets=datasets
-        self.ratios=ratios
-        self.lengths=[]
+    def __init__(self, datasets, ratios):
+        self.datasets = datasets
+        self.ratios = ratios
+        self.lengths = []
         for dataset in self.datasets:
             self.lengths.append(len(dataset))
-        self.lengths=np.array(self.lengths)
-        self.seperate_inds=[]
-        s=0
+        self.lengths = np.array(self.lengths)
+        self.seperate_inds = []
+        s = 0
         for i in self.ratios[:-1]:
-            s+=i
+            s += i
             self.seperate_inds.append(s)
 
     def __len__(self):
-       return self.lengths.sum()
-       
+        return self.lengths.sum()
+
     def __getitem__(self, item):
-        i=np.random.rand()
-        ind=bisect.bisect_right(self.seperate_inds,i)
-        b_ind=np.random.randint(self.lengths[ind])
+        i = np.random.rand()
+        ind = bisect.bisect_right(self.seperate_inds, i)
+        b_ind = np.random.randint(self.lengths[ind])
         return self.datasets[ind][b_ind]
-    #def get_img_info(self,idx):
-
-
-
-
-
-
-
-
+    # def get_img_info(self,idx):

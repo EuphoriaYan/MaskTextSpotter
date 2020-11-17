@@ -3,6 +3,7 @@ import torch
 from shapely.geometry import box
 from shapely import affinity
 import numpy as np
+
 # transpose
 FLIP_LEFT_RIGHT = 0
 FLIP_TOP_BOTTOM = 1
@@ -37,7 +38,8 @@ class BoxList(object):
         self.size = image_size  # (image_width, image_height)
         self.mode = mode
         self.extra_fields = {}
-        self.use_char_ann=use_char_ann
+        self.use_char_ann = use_char_ann
+
     def add_field(self, field, field_data):
         self.extra_fields[field] = field_data
 
@@ -128,30 +130,30 @@ class BoxList(object):
 
         return bbox.convert(self.mode)
 
-    def poly2box(self,poly):
+    def poly2box(self, poly):
         xmin = min(poly[0::2])
         xmax = max(poly[0::2])
         ymin = min(poly[1::2])
         ymax = max(poly[1::2])
-        return [xmin,ymin,xmax,ymax]
+        return [xmin, ymin, xmax, ymax]
 
     def rotate(self, angle, r_c, start_h, start_w):
-        masks=self.extra_fields['masks']
-        masks=masks.rotate(angle,r_c,start_h,start_w)
-        polys=masks.polygons
-        boxes=[]
+        masks = self.extra_fields['masks']
+        masks = masks.rotate(angle, r_c, start_h, start_w)
+        polys = masks.polygons
+        boxes = []
         for poly in polys:
-            box=self.poly2box(poly.polygons[0].numpy())
+            box = self.poly2box(poly.polygons[0].numpy())
             boxes.append(box)
-        self.size=(r_c[0]*2,r_c[1]*2)
-        bbox = BoxList(boxes, self.size, mode="xyxy",use_char_ann=self.use_char_ann)
+        self.size = (r_c[0] * 2, r_c[1] * 2)
+        bbox = BoxList(boxes, self.size, mode="xyxy", use_char_ann=self.use_char_ann)
         for k, v in self.extra_fields.items():
             if k == 'masks':
-                v=masks
+                v = masks
             else:
                 if self.use_char_ann:
                     if not isinstance(v, torch.Tensor):
-                        v = v.rotate(angle,r_c,start_h,start_w)
+                        v = v.rotate(angle, r_c, start_h, start_w)
                 else:
                     if not isinstance(v, torch.Tensor) and k != "char_masks":
                         v = v.rotate(angle, r_c, start_h, start_w)
@@ -188,7 +190,7 @@ class BoxList(object):
         transposed_boxes = torch.cat(
             (transposed_xmin, transposed_ymin, transposed_xmax, transposed_ymax), dim=-1
         )
-        bbox = BoxList(transposed_boxes, self.size, mode="xyxy",use_char_ann=self.use_char_ann)
+        bbox = BoxList(transposed_boxes, self.size, mode="xyxy", use_char_ann=self.use_char_ann)
         # bbox._copy_extra_fields(self)
         for k, v in self.extra_fields.items():
             if not isinstance(v, torch.Tensor):
@@ -209,31 +211,31 @@ class BoxList(object):
         cropped_xmax = (xmax - box[0]).clamp(min=0, max=w)
         cropped_ymax = (ymax - box[1]).clamp(min=0, max=h)
 
-        #ipdb.set_trace()
-        keep_ind=None
+        # ipdb.set_trace()
+        keep_ind = None
         not_empty = np.where((cropped_xmin != cropped_xmax) & (cropped_ymin != cropped_ymax))[0]
         if len(not_empty) > 0:
             keep_ind = not_empty
         cropped_box = torch.cat(
             (cropped_xmin, cropped_ymin, cropped_xmax, cropped_ymax), dim=-1
         )
-        cropped_box=cropped_box[not_empty]
-        bbox = BoxList(cropped_box, (w, h), mode="xyxy",use_char_ann=self.use_char_ann)
+        cropped_box = cropped_box[not_empty]
+        bbox = BoxList(cropped_box, (w, h), mode="xyxy", use_char_ann=self.use_char_ann)
         # bbox._copy_extra_fields(self)
         for k, v in self.extra_fields.items():
             if self.use_char_ann:
                 if not isinstance(v, torch.Tensor):
-                    v = v.crop(box,keep_ind)
+                    v = v.crop(box, keep_ind)
             else:
                 if not isinstance(v, torch.Tensor) and k != "char_masks":
-                    v = v.crop(box,keep_ind)
+                    v = v.crop(box, keep_ind)
             bbox.add_field(k, v)
         return bbox.convert(self.mode)
 
     # Tensor-like methods
 
     def to(self, device):
-        bbox = BoxList(self.bbox.to(device), self.size, self.mode,self.use_char_ann)
+        bbox = BoxList(self.bbox.to(device), self.size, self.mode, self.use_char_ann)
         for k, v in self.extra_fields.items():
             if hasattr(v, "to"):
                 v = v.to(device)
@@ -241,7 +243,7 @@ class BoxList(object):
         return bbox
 
     def __getitem__(self, item):
-        bbox = BoxList(self.bbox[item], self.size, self.mode,self.use_char_ann)
+        bbox = BoxList(self.bbox[item], self.size, self.mode, self.use_char_ann)
         for k, v in self.extra_fields.items():
             bbox.add_field(k, v[item])
         return bbox
@@ -268,7 +270,7 @@ class BoxList(object):
         return area
 
     def copy_with_fields(self, fields):
-        bbox = BoxList(self.bbox, self.size, self.mode,self.use_char_ann)
+        bbox = BoxList(self.bbox, self.size, self.mode, self.use_char_ann)
         if not isinstance(fields, (list, tuple)):
             fields = [fields]
         for field in fields:

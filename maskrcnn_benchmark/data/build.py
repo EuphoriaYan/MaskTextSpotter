@@ -13,7 +13,7 @@ from .collate_batch import BatchCollator
 from .transforms import build_transforms
 
 
-def build_dataset(cfg,dataset_list, transforms, dataset_catalog, is_train=True):
+def build_dataset(cfg, dataset_list, transforms, dataset_catalog, is_train=True):
     """
     Arguments:
         dataset_list (list[str]): Contains the names of the datasets, i.e.,
@@ -25,7 +25,7 @@ def build_dataset(cfg,dataset_list, transforms, dataset_catalog, is_train=True):
     """
     if not isinstance(dataset_list, (list, tuple)):
         raise RuntimeError(
-                "dataset_list should be a list of strings, got {}".format(dataset_list))
+            "dataset_list should be a list of strings, got {}".format(dataset_list))
     datasets = []
     for dataset_name in dataset_list:
         data = dataset_catalog.get(dataset_name)
@@ -47,7 +47,7 @@ def build_dataset(cfg,dataset_list, transforms, dataset_catalog, is_train=True):
     # for training, concatenate all datasets into a single one
     dataset = datasets[0]
     if len(datasets) > 1:
-        dataset=D.MixDataset(datasets,cfg.DATASETS.RATIOS)
+        dataset = D.MixDataset(datasets, cfg.DATASETS.RATIOS)
     #    dataset = D.ConcatDataset(datasets)
 
     return [dataset]
@@ -79,7 +79,7 @@ def _compute_aspect_ratios(dataset):
 
 
 def make_batch_data_sampler(
-    dataset, sampler, aspect_grouping, images_per_batch, num_iters=None, start_iter=0
+        dataset, sampler, aspect_grouping, images_per_batch, num_iters=None, start_iter=0
 ):
     if aspect_grouping:
         if not isinstance(aspect_grouping, (list, tuple)):
@@ -103,7 +103,7 @@ def make_data_loader(cfg, is_train=True, is_distributed=False, start_iter=0):
     if is_train:
         images_per_batch = cfg.SOLVER.IMS_PER_BATCH
         assert (
-            images_per_batch % num_gpus == 0
+                images_per_batch % num_gpus == 0
         ), "SOLVER.IMS_PER_BATCH ({}) must be divisible by the number "
         "of GPUs ({}) used.".format(images_per_batch, num_gpus)
         images_per_gpu = images_per_batch // num_gpus
@@ -112,7 +112,7 @@ def make_data_loader(cfg, is_train=True, is_distributed=False, start_iter=0):
     else:
         images_per_batch = cfg.TEST.IMS_PER_BATCH
         assert (
-            images_per_batch % num_gpus == 0
+                images_per_batch % num_gpus == 0
         ), "TEST.IMS_PER_BATCH ({}) must be divisible by the number "
         "of GPUs ({}) used.".format(images_per_batch, num_gpus)
         images_per_gpu = images_per_batch // num_gpus
@@ -145,7 +145,7 @@ def make_data_loader(cfg, is_train=True, is_distributed=False, start_iter=0):
     dataset_list = cfg.DATASETS.TRAIN if is_train else cfg.DATASETS.TEST
 
     transforms = build_transforms(cfg, is_train)
-    datasets = build_dataset(cfg,dataset_list, transforms, DatasetCatalog, is_train)
+    datasets = build_dataset(cfg, dataset_list, transforms, DatasetCatalog, is_train)
 
     data_loaders = []
     for dataset in datasets:

@@ -15,7 +15,6 @@ from ..utils.comm import is_main_process
 from ..utils.comm import scatter_gather
 from ..utils.comm import synchronize
 
-
 from maskrcnn_benchmark.modeling.roi_heads.mask_head.inference import Masker
 from maskrcnn_benchmark.structures.boxlist_ops import boxlist_iou
 
@@ -123,7 +122,7 @@ def prepare_for_coco_segmentation(predictions, dataset):
 
 # inspired from Detectron
 def evaluate_box_proposals(
-    predictions, dataset, thresholds=None, area="all", limit=None
+        predictions, dataset, thresholds=None, area="all", limit=None
 ):
     """Evaluate detection proposal recall metrics. This function is a much
     faster alternative to the official COCO API recall evaluation code. However,
@@ -239,7 +238,7 @@ def evaluate_box_proposals(
 
 
 def evaluate_predictions_on_coco(
-    coco_gt, coco_results, json_result_file, iou_type="bbox"
+        coco_gt, coco_results, json_result_file, iou_type="bbox"
 ):
     import json
 
@@ -347,16 +346,15 @@ def check_expected_results(results, expected_results, sigma_tol):
 
 
 def inference(
-    model,
-    data_loader,
-    iou_types=("bbox",),
-    box_only=False,
-    device="cuda",
-    expected_results=(),
-    expected_results_sigma_tol=4,
-    output_folder=None,
+        model,
+        data_loader,
+        iou_types=("bbox",),
+        box_only=False,
+        device="cuda",
+        expected_results=(),
+        expected_results_sigma_tol=4,
+        output_folder=None,
 ):
-
     # convert to a torch.device for efficiency
     device = torch.device(device)
     num_devices = (

@@ -3,7 +3,6 @@ import os
 
 from yacs.config import CfgNode as CN
 
-
 # -----------------------------------------------------------------------------
 # Convention about Training / Test specific parameters
 # -----------------------------------------------------------------------------
@@ -41,7 +40,6 @@ _C.SEQUENCE.TEACHER_FORCE_RATIO = 1.0
 _C.SEQUENCE.TWO_CONV = False
 _C.SEQUENCE.MEAN_SCORE = False
 
-
 # -----------------------------------------------------------------------------
 # INPUT
 # -----------------------------------------------------------------------------
@@ -61,7 +59,6 @@ _C.INPUT.PIXEL_STD = [1., 1., 1.]
 # Convert image to BGR format (for Caffe2 models), in range 0-255
 _C.INPUT.TO_BGR255 = True
 
-
 # -----------------------------------------------------------------------------
 # Dataset
 # -----------------------------------------------------------------------------
@@ -71,10 +68,10 @@ _C.DATASETS.TRAIN = ()
 # List of the dataset names for testing, as present in paths_catalog.py
 _C.DATASETS.TEST = ()
 
-_C.DATASETS.RATIOS=[]
+_C.DATASETS.RATIOS = []
 
-_C.DATASETS.AUG=False
-_C.DATASETS.RANDOM_CROP_PROB=0.
+_C.DATASETS.AUG = False
+_C.DATASETS.RANDOM_CROP_PROB = 0.
 # -----------------------------------------------------------------------------
 # DataLoader
 # -----------------------------------------------------------------------------
@@ -103,7 +100,6 @@ _C.MODEL.BACKBONE.CONV_BODY = "R-50-C4"
 # Add StopGrad at a specified stage so the bottom layers are frozen
 _C.MODEL.BACKBONE.FREEZE_CONV_BODY_AT = 2
 _C.MODEL.BACKBONE.OUT_CHANNELS = 256 * 4
-
 
 # ---------------------------------------------------------------------------- #
 # RPN options
@@ -149,7 +145,6 @@ _C.MODEL.RPN.MIN_SIZE = 0
 _C.MODEL.RPN.FPN_POST_NMS_TOP_N_TRAIN = 2000
 _C.MODEL.RPN.FPN_POST_NMS_TOP_N_TEST = 2000
 
-
 # ---------------------------------------------------------------------------- #
 # ROI HEADS options
 # ---------------------------------------------------------------------------- #
@@ -184,7 +179,6 @@ _C.MODEL.ROI_HEADS.NMS = 0.5
 # established for the COCO dataset)
 _C.MODEL.ROI_HEADS.DETECTIONS_PER_IMG = 100
 
-
 _C.MODEL.ROI_BOX_HEAD = CN()
 _C.MODEL.ROI_BOX_HEAD.FEATURE_EXTRACTOR = "ResNet50Conv5ROIFeatureExtractor"
 _C.MODEL.ROI_BOX_HEAD.PREDICTOR = "FastRCNNPredictor"
@@ -194,7 +188,6 @@ _C.MODEL.ROI_BOX_HEAD.POOLER_SCALES = (1.0 / 16,)
 _C.MODEL.ROI_BOX_HEAD.NUM_CLASSES = 81
 # Hidden layer dimension when using an MLP for the RoI box head
 _C.MODEL.ROI_BOX_HEAD.MLP_HEAD_DIM = 1024
-
 
 _C.MODEL.ROI_MASK_HEAD = CN()
 _C.MODEL.ROI_MASK_HEAD.FEATURE_EXTRACTOR = "ResNet50Conv5ROIFeatureExtractor"
@@ -287,7 +280,6 @@ _C.TEST.IMS_PER_BATCH = 8
 _C.TEST.VIS = False
 # from 0 to 255
 _C.TEST.CHAR_THRESH = 128
-
 
 # ---------------------------------------------------------------------------- #
 # Misc options

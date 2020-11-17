@@ -13,13 +13,14 @@ from PIL import Image
 import numpy as np
 import argparse
 
+
 class TextDemo(object):
     def __init__(
-        self,
-        cfg,
-        confidence_threshold=0.7,
-        min_image_size=224,
-        output_polygon=True
+            self,
+            cfg,
+            confidence_threshold=0.7,
+            min_image_size=224,
+            output_polygon=True
     ):
         self.cfg = cfg.clone()
         self.model = build_detection_model(cfg)
@@ -112,8 +113,9 @@ class TextDemo(object):
             if score < self.confidence_threshold:
                 continue
             box = list(map(int, box))
-            mask = masks[k,0,:,:]
-            polygon = self.mask2polygon(mask, box, original_image.shape, threshold=0.5, output_polygon=self.output_polygon)
+            mask = masks[k, 0, :, :]
+            polygon = self.mask2polygon(mask, box, original_image.shape, threshold=0.5,
+                                        output_polygon=self.output_polygon)
             if polygon is None:
                 polygon = [box[0], box[1], box[2], box[1], box[2], box[3], box[0], box[3]]
             result_polygons.append(polygon)
@@ -133,7 +135,7 @@ class TextDemo(object):
         for index in range(char_masks.shape[0]):
             box = list(boxes[index])
             box = list(map(int, box))
-            text, rec_score, _, _ = getstr_grid(char_masks[index,:,:,:].copy(), box, threshold=threshold)
+            text, rec_score, _, _ = getstr_grid(char_masks[index, :, :, :].copy(), box, threshold=threshold)
             texts.append(text)
             rec_scores.append(rec_score)
         return texts, rec_scores
@@ -143,55 +145,56 @@ class TextDemo(object):
         image_width, image_height = im_size[1], im_size[0]
         box_h = box[3] - box[1]
         box_w = box[2] - box[0]
-        cls_polys = (mask*255).astype(np.uint8)
+        cls_polys = (mask * 255).astype(np.uint8)
         poly_map = np.array(Image.fromarray(cls_polys).resize((box_w, box_h)))
         poly_map = poly_map.astype(np.float32) / 255
-        poly_map=cv2.GaussianBlur(poly_map,(3,3),sigmaX=3)
-        ret, poly_map = cv2.threshold(poly_map,0.5,1,cv2.THRESH_BINARY)
+        poly_map = cv2.GaussianBlur(poly_map, (3, 3), sigmaX=3)
+        ret, poly_map = cv2.threshold(poly_map, 0.5, 1, cv2.THRESH_BINARY)
         if output_polygon:
-            SE1=cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
-            poly_map = cv2.erode(poly_map,SE1) 
-            poly_map = cv2.dilate(poly_map,SE1);
-            poly_map = cv2.morphologyEx(poly_map,cv2.MORPH_CLOSE,SE1)
+            SE1 = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+            poly_map = cv2.erode(poly_map, SE1)
+            poly_map = cv2.dilate(poly_map, SE1);
+            poly_map = cv2.morphologyEx(poly_map, cv2.MORPH_CLOSE, SE1)
             try:
-                _, contours, _ = cv2.findContours((poly_map * 255).astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+                _, contours, _ = cv2.findContours((poly_map * 255).astype(np.uint8), cv2.RETR_LIST,
+                                                  cv2.CHAIN_APPROX_NONE)
             except:
                 contours, _ = cv2.findContours((poly_map * 255).astype(np.uint8), cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
-            if len(contours)==0:
+            if len(contours) == 0:
                 print(contours)
                 print(len(contours))
                 return None
-            max_area=0
+            max_area = 0
             max_cnt = contours[0]
             for cnt in contours:
-                area=cv2.contourArea(cnt)
+                area = cv2.contourArea(cnt)
                 if area > max_area:
                     max_area = area
                     max_cnt = cnt
-            perimeter = cv2.arcLength(max_cnt,True)
-            epsilon = 0.01*cv2.arcLength(max_cnt,True)
-            approx = cv2.approxPolyDP(max_cnt,epsilon,True)
-            pts = approx.reshape((-1,2))
-            pts[:,0] = pts[:,0] + box[0]
-            pts[:,1] = pts[:,1] + box[1]
+            perimeter = cv2.arcLength(max_cnt, True)
+            epsilon = 0.01 * cv2.arcLength(max_cnt, True)
+            approx = cv2.approxPolyDP(max_cnt, epsilon, True)
+            pts = approx.reshape((-1, 2))
+            pts[:, 0] = pts[:, 0] + box[0]
+            pts[:, 1] = pts[:, 1] + box[1]
             polygon = list(pts.reshape((-1,)))
             polygon = list(map(int, polygon))
-            if len(polygon)<6:
-                return None     
-        else:      
-            SE1=cv2.getStructuringElement(cv2.MORPH_RECT,(3,3))
-            poly_map = cv2.erode(poly_map,SE1) 
-            poly_map = cv2.dilate(poly_map,SE1);
-            poly_map = cv2.morphologyEx(poly_map,cv2.MORPH_CLOSE,SE1)
-            idy,idx=np.where(poly_map == 1)
-            xy=np.vstack((idx,idy))
-            xy=np.transpose(xy)
-            hull = cv2.convexHull(xy, clockwise=True)
-            #reverse order of points.
-            if  hull is None:
+            if len(polygon) < 6:
                 return None
-            hull=hull[::-1]
-            #find minimum area bounding box.
+        else:
+            SE1 = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+            poly_map = cv2.erode(poly_map, SE1)
+            poly_map = cv2.dilate(poly_map, SE1);
+            poly_map = cv2.morphologyEx(poly_map, cv2.MORPH_CLOSE, SE1)
+            idy, idx = np.where(poly_map == 1)
+            xy = np.vstack((idx, idy))
+            xy = np.transpose(xy)
+            hull = cv2.convexHull(xy, clockwise=True)
+            # reverse order of points.
+            if hull is None:
+                return None
+            hull = hull[::-1]
+            # find minimum area bounding box.
             rect = cv2.minAreaRect(hull)
             corners = cv2.boxPoints(rect)
             corners = np.array(corners, dtype="int")
@@ -203,11 +206,11 @@ class TextDemo(object):
     def visualization(self, image, polygons, words):
         for polygon, word in zip(polygons, words):
             pts = np.array(polygon, np.int32)
-            pts = pts.reshape((-1,1,2))
-            xmin = min(pts[:,0,0])
-            ymin = min(pts[:,0,1])
-            cv2.polylines(image,[pts],True,(0,0,255))
-            cv2.putText(image, word, (xmin, ymin), cv2.FONT_HERSHEY_COMPLEX, 1, (0,0,255), 2)
+            pts = pts.reshape((-1, 1, 2))
+            xmin = min(pts[:, 0, 0])
+            ymin = min(pts[:, 0, 1])
+            cv2.polylines(image, [pts], True, (0, 0, 255))
+            cv2.putText(image, word, (xmin, ymin), cv2.FONT_HERSHEY_COMPLEX, 1, (0, 0, 255), 2)
 
 
 def main(args):
@@ -223,11 +226,12 @@ def main(args):
         output_polygon=True
     )
     # load image and then run prediction
-    
+
     image = cv2.imread(args.image_path)
     result_polygons, result_words = text_demo.run_on_opencv_image(image)
     text_demo.visualization(image, result_polygons, result_words)
     cv2.imwrite(args.visu_path, image)
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='parameters for demo')

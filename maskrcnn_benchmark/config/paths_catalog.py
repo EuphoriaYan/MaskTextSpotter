@@ -3,11 +3,13 @@
 
 import os
 
+
 def add_gt_path(data_dir, attrs):
-    if len(attrs)>1:
-        return os.path.join(data_dir,attrs[1])
+    if len(attrs) > 1:
+        return os.path.join(data_dir, attrs[1])
     else:
         return None
+
 
 class DatasetCatalog(object):
     DATA_DIR = "datasets"
@@ -26,12 +28,12 @@ class DatasetCatalog(object):
             "coco/val2014",
             "coco/annotations/instances_valminusminival2014.json",
         ),
-        "icdar_2013_train":(
+        "icdar_2013_train": (
             "icdar2013/train_images",
             "icdar2013/train_gts",
 
         ),
-        "icdar_2013_test":(
+        "icdar_2013_test": (
             "icdar2013/test_images",
             "icdar2013/test_gts",
         ),
@@ -45,7 +47,7 @@ class DatasetCatalog(object):
             # "icdar2015/test_gts",
 
         ),
-        "synthtext_train":(
+        "synthtext_train": (
             "synthtext/train_images",
             "synthtext/train_gts",
 
@@ -63,7 +65,7 @@ class DatasetCatalog(object):
             "total_text/test_images",
             # "total_text/test_gts",
         ),
-        "scut-eng-char_train":(
+        "scut-eng-char_train": (
             "scut-eng-char/train_images",
             "scut-eng-char/train_gts",
         ),
@@ -85,11 +87,11 @@ class DatasetCatalog(object):
             )
         elif "icdar_2013" in name:
             data_dir = DatasetCatalog.DATA_DIR
-            attrs=DatasetCatalog.DATASETS[name]
-            args=dict(
+            attrs = DatasetCatalog.DATASETS[name]
+            args = dict(
                 use_charann=True,
-                imgs_dir=os.path.join(data_dir,attrs[0]),
-                gts_dir=add_gt_path(data_dir,attrs),
+                imgs_dir=os.path.join(data_dir, attrs[0]),
+                gts_dir=add_gt_path(data_dir, attrs),
             )
             return dict(
                 args=args,
@@ -97,14 +99,14 @@ class DatasetCatalog(object):
             )
         elif "icdar_2015" in name:
             data_dir = DatasetCatalog.DATA_DIR
-            attrs=DatasetCatalog.DATASETS[name]
-            if len(attrs)>1:
-                gts_dir = os.path.join(data_dir,attrs[1])
+            attrs = DatasetCatalog.DATASETS[name]
+            if len(attrs) > 1:
+                gts_dir = os.path.join(data_dir, attrs[1])
             else:
                 gts_dir = None
-            args=dict(
+            args = dict(
                 use_charann=False,
-                imgs_dir=os.path.join(data_dir,attrs[0]),
+                imgs_dir=os.path.join(data_dir, attrs[0]),
                 gts_dir=gts_dir,
             )
             return dict(
@@ -113,12 +115,12 @@ class DatasetCatalog(object):
             )
         elif "synthtext" in name:
             data_dir = DatasetCatalog.DATA_DIR
-            attrs=DatasetCatalog.DATASETS[name]
-            args=dict(
+            attrs = DatasetCatalog.DATASETS[name]
+            args = dict(
                 use_charann=True,
                 list_file_path=os.path.join(data_dir, 'synthtext/train_list.txt'),
-                imgs_dir=os.path.join(data_dir,attrs[0]),
-                gts_dir=add_gt_path(data_dir,attrs),
+                imgs_dir=os.path.join(data_dir, attrs[0]),
+                gts_dir=add_gt_path(data_dir, attrs),
             )
             return dict(
                 args=args,
@@ -127,8 +129,8 @@ class DatasetCatalog(object):
         elif "total_text" in name:
             data_dir = DatasetCatalog.DATA_DIR
             attrs = DatasetCatalog.DATASETS[name]
-            if len(attrs)>1:
-                gts_dir = os.path.join(data_dir,attrs[1])
+            if len(attrs) > 1:
+                gts_dir = os.path.join(data_dir, attrs[1])
             else:
                 gts_dir = None
             args = dict(

@@ -3,7 +3,7 @@
 Simple dataset class that wraps a list of path names
 """
 
-from PIL import Image,ImageDraw
+from PIL import Image, ImageDraw
 import os
 from maskrcnn_benchmark.structures.bounding_box import BoxList
 from maskrcnn_benchmark.structures.segmentation_mask import SegmentationMask, SegmentationCharMask, CharPolygons
@@ -11,72 +11,73 @@ import numpy as np
 import torch
 import pickle
 
+
 class SynthtextDataset(object):
     def __init__(self, use_charann, list_file_path, imgs_dir, gts_dir, transforms=None):
-        self.use_charann=use_charann
+        self.use_charann = use_charann
         list_file = open(list_file_path, 'r')
         image_lines = list_file.readlines()
         self.image_lists = [os.path.join(imgs_dir, line.strip()) for line in image_lines]
-        self.gt_lists=[os.path.join(gts_dir, line.strip()+'.txt') for line in image_lines]
+        self.gt_lists = [os.path.join(gts_dir, line.strip() + '.txt') for line in image_lines]
         self.filtered_gts = []
         self.transforms = transforms
-        self.min_proposal_size=2
+        self.min_proposal_size = 2
         self.char_classes = '_0123456789abcdefghijklmnopqrstuvwxyz'
-        self.vis=False
+        self.vis = False
 
     def __getitem__(self, item):
-        im_name=os.path.basename(self.image_lists[item])
-        #print(self.image_lists[item])
+        im_name = os.path.basename(self.image_lists[item])
+        # print(self.image_lists[item])
         img = Image.open(self.image_lists[item]).convert("RGB")
-        width,height=img.size
-        gt_path=self.gt_lists[item]
-        words,boxes,charsbbs,segmentations=self.load_gt_from_txt(gt_path,height,width)
-        target = BoxList(boxes[:,:4], img.size, mode="xyxy",use_char_ann=self.use_charann)
-        classes=torch.ones(len(boxes))
+        width, height = img.size
+        gt_path = self.gt_lists[item]
+        words, boxes, charsbbs, segmentations = self.load_gt_from_txt(gt_path, height, width)
+        target = BoxList(boxes[:, :4], img.size, mode="xyxy", use_char_ann=self.use_charann)
+        classes = torch.ones(len(boxes))
         target.add_field("labels", classes)
         masks = SegmentationMask(segmentations, img.size)
         target.add_field("masks", masks)
-        if words[0]=='':
+        if words[0] == '':
             use_char_ann = False
         else:
             use_char_ann = True
         if not self.use_charann:
             use_char_ann = False
-        char_masks=SegmentationCharMask(charsbbs, words=words, use_char_ann=use_char_ann, size=img.size)
+        char_masks = SegmentationCharMask(charsbbs, words=words, use_char_ann=use_char_ann, size=img.size)
         target.add_field("char_masks", char_masks)
         if self.transforms is not None:
             img, target = self.transforms(img, target)
         if self.vis:
-            new_im=img.numpy().copy().transpose([1,2,0])+[102.9801,115.9465,122.7717]
-            new_im=Image.fromarray(new_im.astype(np.uint8)).convert('RGB')
+            new_im = img.numpy().copy().transpose([1, 2, 0]) + [102.9801, 115.9465, 122.7717]
+            new_im = Image.fromarray(new_im.astype(np.uint8)).convert('RGB')
             mask = target.extra_fields['masks'].polygons[0].convert('mask')
             mask = Image.fromarray((mask.numpy() * 255).astype(np.uint8)).convert('RGB')
             if self.use_charann:
                 m, _ = target.extra_fields['char_masks'].chars_boxes[0].convert('char_mask')
-                color=self.creat_color_map(37,255)
-                color_map=color[m.numpy().astype(np.uint8)]
-                char=Image.fromarray(color_map.astype(np.uint8)).convert('RGB')
+                color = self.creat_color_map(37, 255)
+                color_map = color[m.numpy().astype(np.uint8)]
+                char = Image.fromarray(color_map.astype(np.uint8)).convert('RGB')
                 char = Image.blend(char, new_im, 0.5)
             else:
-                char =new_im
-            new=Image.blend(char,mask,0.5)
+                char = new_im
+            new = Image.blend(char, mask, 0.5)
             img_draw = ImageDraw.Draw(new)
             for box in target.bbox.numpy():
-                box=list(box)
-                box = box[:2]+[box[2],box[1]]+box[2:] + [box[0],box[3]] + box[:2]
+                box = list(box)
+                box = box[:2] + [box[2], box[1]] + box[2:] + [box[0], box[3]] + box[:2]
                 img_draw.line(box, fill=(255, 0, 0), width=2)
-            new.save('./vis/char_'+im_name)
+            new.save('./vis/char_' + im_name)
         return img, target, self.image_lists[item]
 
-    def creat_color_map(self,n_class, width):
+    def creat_color_map(self, n_class, width):
         splits = int(np.ceil(np.power((n_class * 1.0), 1.0 / 3)))
         maps = []
         for i in range(splits):
-            r = int(i * width * 1.0 / (splits-1))
+            r = int(i * width * 1.0 / (splits - 1))
             for j in range(splits):
-                g = int(j * width * 1.0 / (splits-1))
-                for k in range(splits-1):
-                    b = int(k * width * 1.0 / (splits-1))
+                g = int(j * width * 1.0 / (splits - 1))
+                for k in range(splits - 1):
+                    b = int(k * width * 1.0 / (splits - 1))
                     maps.append([r, g, b])
         return np.array(maps)
 
@@ -84,7 +85,7 @@ class SynthtextDataset(object):
         return len(self.image_lists)
 
     def load_gt_from_txt(self, gt_path, height=None, width=None):
-        words, boxes, charsboxes, segmentations=[], [], [], []
+        words, boxes, charsboxes, segmentations = [], [], [], []
         lines = open(gt_path).readlines()
         for line in lines:
             charbbs = []
@@ -99,7 +100,7 @@ class SynthtextDataset(object):
                 max_x = max(rect[::2]) - 1
                 max_y = max(rect[1::2]) - 1
                 box = [min_x, min_y, max_x, max_y]
-                segmentations.append([loc[0,:]])
+                segmentations.append([loc[0, :]])
                 tindex = len(boxes)
                 boxes.append(box)
                 words.append(word)
@@ -108,17 +109,18 @@ class SynthtextDataset(object):
                 if loc.shape[0] > 1:
                     for i in range(1, loc.shape[0]):
                         charbb[:8] = loc[i, :]
-                        charbb[8] = c_class[i-1]
+                        charbb[8] = c_class[i - 1]
                         charbb[9] = tindex
                         charbbs.append(charbb.copy())
                 else:
                     charbbs.append(charbb.copy())
                 charsboxes.append(charbbs)
-        num_boxes=len(boxes)
+        num_boxes = len(boxes)
         if len(boxes) > 0:
-            keep_boxes=np.zeros((num_boxes,5))
-            keep_boxes[:,:4]=np.array(boxes)
-            keep_boxes[:,4]=range(num_boxes) #the 5th column is the box label,same as the 10th column of all charsboxes which belong to the box
+            keep_boxes = np.zeros((num_boxes, 5))
+            keep_boxes[:, :4] = np.array(boxes)
+            keep_boxes[:, 4] = range(
+                num_boxes)  # the 5th column is the box label,same as the 10th column of all charsboxes which belong to the box
             if self.use_charann:
                 return words, np.array(keep_boxes), charsboxes, segmentations
             else:
@@ -130,7 +132,6 @@ class SynthtextDataset(object):
             words.append('')
             charbbs = np.zeros((10,), dtype=np.float32)
             return words, np.zeros((1, 5), dtype=np.float32), [[charbbs]], [[np.zeros((8,), dtype=np.float32)]]
-
 
     def line2boxes(self, line):
         parts = line.strip().split(',')
@@ -174,9 +175,9 @@ class SynthtextDataset(object):
         Return the image dimensions for the image, without
         loading and pre-processing it
         """
-        
+
         im_name = os.path.basename(self.image_lists[item])
         img = Image.open(self.image_lists[item])
-        width,height=img.size
+        width, height = img.size
         img_info = {'im_name': im_name, 'height': height, 'width': width}
         return img_info

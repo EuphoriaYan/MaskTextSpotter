@@ -24,10 +24,12 @@ def is_main_process():
         return True
     return dist.get_rank() == 0
 
+
 def get_rank():
     if not dist.is_initialized():
         return 0
     return dist.get_rank()
+
 
 def synchronize():
     """
@@ -66,12 +68,12 @@ def _encode(encoded_data, data):
     assert s <= 255, "Can't encode data greater than 255 bytes"
     # put the encoded data in encoded_data
     encoded_data[0] = s
-    encoded_data[1 : (s + 1)] = tensor
+    encoded_data[1: (s + 1)] = tensor
 
 
 def _decode(encoded_data):
     size = encoded_data[0]
-    encoded_tensor = encoded_data[1 : (size + 1)].to("cpu")
+    encoded_tensor = encoded_data[1: (size + 1)].to("cpu")
     return pickle.loads(bytearray(encoded_tensor.tolist()))
 
 

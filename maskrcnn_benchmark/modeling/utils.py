@@ -14,4 +14,3 @@ def cat(tensors, dim=0):
     if len(tensors) == 1:
         return tensors[0]
     return torch.cat(tensors, dim)
-    

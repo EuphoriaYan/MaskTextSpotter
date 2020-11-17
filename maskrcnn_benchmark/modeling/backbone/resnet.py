@@ -19,7 +19,6 @@ from torch import nn
 from maskrcnn_benchmark.layers import FrozenBatchNorm2d
 from maskrcnn_benchmark.layers import Conv2d
 
-
 # ResNet stage specification
 StageSpec = namedtuple(
     "StageSpec",
@@ -123,14 +122,14 @@ class ResNet(nn.Module):
 
 class ResNetHead(nn.Module):
     def __init__(
-        self,
-        block_module,
-        stages,
-        num_groups=1,
-        width_per_group=64,
-        stride_in_1x1=True,
-        stride_init=None,
-        res2_out_channels=256,
+            self,
+            block_module,
+            stages,
+            num_groups=1,
+            width_per_group=64,
+            stride_in_1x1=True,
+            stride_init=None,
+            res2_out_channels=256,
     ):
         super(ResNetHead, self).__init__()
 
@@ -169,14 +168,14 @@ class ResNetHead(nn.Module):
 
 
 def _make_stage(
-    transformation_module,
-    in_channels,
-    bottleneck_channels,
-    out_channels,
-    block_count,
-    num_groups,
-    stride_in_1x1,
-    first_stride,
+        transformation_module,
+        in_channels,
+        bottleneck_channels,
+        out_channels,
+        block_count,
+        num_groups,
+        stride_in_1x1,
+        first_stride,
 ):
     blocks = []
     stride = first_stride
@@ -198,13 +197,13 @@ def _make_stage(
 
 class BottleneckWithFixedBatchNorm(nn.Module):
     def __init__(
-        self,
-        in_channels,
-        bottleneck_channels,
-        out_channels,
-        num_groups=1,
-        stride_in_1x1=True,
-        stride=1,
+            self,
+            in_channels,
+            bottleneck_channels,
+            out_channels,
+            num_groups=1,
+            stride_in_1x1=True,
+            stride=1,
     ):
         super(BottleneckWithFixedBatchNorm, self).__init__()
 

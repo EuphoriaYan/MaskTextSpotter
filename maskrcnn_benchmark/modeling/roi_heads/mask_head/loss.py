@@ -43,6 +43,7 @@ def project_masks_on_boxes(segmentation_masks, proposals, discretization_size):
         return torch.empty(0, dtype=torch.float32, device=device)
     return torch.stack(masks, dim=0).to(device, dtype=torch.float32)
 
+
 class MaskRCNNLossComputation(object):
     def __init__(self, proposal_matcher, discretization_size):
         """
@@ -127,6 +128,7 @@ class MaskRCNNLossComputation(object):
             mask_logits[positive_inds, labels_pos], mask_targets
         )
         return mask_loss
+
 
 class CharMaskRCNNLossComputation(object):
     def __init__(self, use_weighted_loss=False):

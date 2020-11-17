@@ -8,6 +8,7 @@ from torch.nn import functional as F
 
 from maskrcnn_benchmark.structures.bounding_box import BoxList
 
+
 # TODO check if want to return a single BoxList or a composite
 # object
 class MaskPostProcessor(nn.Module):
@@ -60,6 +61,8 @@ class MaskPostProcessor(nn.Module):
             results.append(bbox)
 
         return results
+
+
 # TODO
 class CharMaskPostProcessor(nn.Module):
     """
@@ -92,7 +95,9 @@ class CharMaskPostProcessor(nn.Module):
         mask_prob = x.sigmoid()
         char_mask_softmax = F.softmax(char_mask, dim=1)
         image_width, image_height = boxes[0].size
-        char_results = {'char_mask': char_mask_softmax.cpu().numpy(), 'boxes': boxes[0].bbox.cpu().numpy(), 'seq_outputs': seq_outputs, 'seq_scores': seq_scores, 'detailed_seq_scores': detailed_seq_scores}
+        char_results = {'char_mask': char_mask_softmax.cpu().numpy(), 'boxes': boxes[0].bbox.cpu().numpy(),
+                        'seq_outputs': seq_outputs, 'seq_scores': seq_scores,
+                        'detailed_seq_scores': detailed_seq_scores}
         # select masks coresponding to the predicted classes
         num_masks = x.shape[0]
         mask_prob = mask_prob.squeeze(dim=1)[:, None]
@@ -111,6 +116,7 @@ class CharMaskPostProcessor(nn.Module):
             results.append(bbox)
 
         return [results, char_results]
+
 
 class MaskPostProcessorCOCOFormat(MaskPostProcessor):
     """
@@ -198,8 +204,8 @@ def paste_mask_in_image(mask, box, im_h, im_w, thresh=0.5, padding=1):
     y_1 = min(box[3] + 1, im_h)
 
     im_mask[y_0:y_1, x_0:x_1] = mask[
-        (y_0 - box[1]) : (y_1 - box[1]), (x_0 - box[0]) : (x_1 - box[0])
-    ]
+                                (y_0 - box[1]): (y_1 - box[1]), (x_0 - box[0]): (x_1 - box[0])
+                                ]
     return im_mask
 
 
@@ -233,6 +239,7 @@ class Masker(object):
         assert len(boxes) == 1, "Only single image batch supported"
         result = self.forward_single_image(masks, boxes[0])
         return result
+
 
 def make_roi_mask_post_processor(cfg):
     masker = None
