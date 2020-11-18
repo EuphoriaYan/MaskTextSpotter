@@ -33,7 +33,7 @@ dist/
 *.JPG
 *.JPEG
 *.zip
-*.txt
+# *.txt
 
 evaluation
 
