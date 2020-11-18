@@ -4,6 +4,7 @@ import sys
 
 import json
 import argparse
+from tqdm import tqdm
 
 
 def parse_args():
@@ -17,7 +18,7 @@ def parse_args():
 if __name__ == '__main__':
     args = parse_args()
     with open(args.input_gt, 'r', encoding='utf-8') as fp:
-        for line in fp:
+        for line in tqdm(fp):
             image_name, image_json = line.strip().split('\t')
             image_json = json.loads(image_json)
             text_list = image_json['text_list']
